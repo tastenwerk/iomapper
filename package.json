@@ -1,0 +1,30 @@
+{
+  "private": false,
+  "name": "konter",
+  "version": "0.0.1",
+  "preferGlobal": "true",
+  "author": "thorsten zerha <thorsten.zerha@tastenwerk.com>",
+  "description": "konter is a content repository",
+  "keywords": [ "mongoose", "tas10", "content repository" ],
+  "homepage": "http://github.com/quaqua/konter",
+  "bugs": { 
+    "url" : "http://github.com/quaqua/konter/issues", 
+    "email" : "konter@tastenwerk.com"
+  },
+  "main": "index",
+  "dependencies": {
+    "mongoose": "*"
+  },
+  "devDependencies": {
+    "should": "x.x.x",
+    "mocha": "1.x.x"
+  },
+  "license": "GPL3",
+  "engine": {
+    "node": ">=0.8"
+  },
+  "scripts": {
+    "test" : "node_modules/.bin/mocha --reporter list",
+    "doc": "node_modules/.bin/doc_generator"
+  }
+}
