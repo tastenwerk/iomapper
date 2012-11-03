@@ -12,9 +12,28 @@ var mongoose = require('mongoose')
   , Schema = mongoose.Schema;
 
 var logSchema = require( __dirname + '/lib/log_schema' )
-  , commentSchema = require( __dirname + '/lib/comment_schema' );
+  , commentSchema = require( __dirname + '/lib/comment_schema' )
+  , User = require( __dirname + '/lib/models/user' )
+  , paths = require( __dirname + '/lib/paths' );
 
-// paths [ "2029320936:Contact/203920936802936:Label/", "20936236:Label" ]
+mongoose.Query.prototype.withUser = function withUser( user, callback ){
+  var acl = []
+    , allowed = ['acl.'+user.id+'.privileges', 'acl.'+User.anybodyId+'.privileges', 'acl.'+User.everybodyId+'.privileges']
+  for( var i in allowed ){
+    var h = {};
+    h[allowed[i]] = /r*/;
+    acl.push( h );
+  }
+  this.or( acl );
+  this.exec( function( err, doc ){
+    if( err )
+      callback( err );
+    else{
+      doc.holder = user;
+      callback( null, doc )
+    }
+  });
+};
 
 var KonterPlugin = function KonterPlugin (schema, options) {
 
@@ -23,10 +42,12 @@ var KonterPlugin = function KonterPlugin (schema, options) {
   						 updatedAt: { type: Date, default: Date.now },
   						 _updater: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   						 _starred: [ {type: mongoose.Schema.Types.ObjectId, ref: 'user', index: true} ],
+               pos: Number,
   						 logs: [ logSchema ],
+               _type: String,
                paths: [ {type: String, index: true} ],
   						 acl: {type: mongoose.Schema.Types.Mixed, default: {}, index: true},
-  						 name: {type: String, index: true},
+  						 name: {type: String, index: true, required: true},
   						 comments: [ commentSchema ]
 
   });
@@ -61,126 +82,43 @@ var KonterPlugin = function KonterPlugin (schema, options) {
    * object (must be persisted)
    *
    */
-  schema.virtual('parent').set( function( co ){
-    if( typeof(co) === 'object' && co.id )
-      this.paths.push( co.id.toString() + ':' + co.constructor.modelName );
-    else
-      this.paths.push( co );
-  })
+  schema.virtual('parent').set( paths.setParent );
 
   /**
    * setup the creator and give full access to their 
    * newly created object.
    *
    * if the holder object has not been set up till here
-   * an error will be thrown. It is illegal to create
+   * an error will be passed to the next callback. It is illegal to create
    * objects without a user being set.
    *
    */
   schema.pre('save', function setupCreatorAndAccess( next ) {
     if( this.isNew ){
-      if( !this.holder )
-        throw "konter.securityleak: no holder object has been provided!";
+      if( !this.holder ){
+        next( new Error("[pre.save.setupCreatorAndAccess] konter.securityleak: no holder object has been provided!") );
+        return;
+      }
       this._creator = this._updater = this.holder._id;
-      this.acl[this._creator] = 'rwsd';
+      this.acl[this._creator] = {privileges: 'rwsd'};
     }
     next();
   });
 
   /**
-   * finds all parents
-   *
-   * @param {Object} options
-   *
-   * @param {Function} [callback] - [ err, array ]
-   *
+   * save the modelname along with the database
    */
-  schema.method('parents', function( options, callback ){
-    if( typeof(options) === 'function' ){
-      callback = options;
-      options = null;
-    }
-    var parentsArr = []
-      , self = this;
-    self.paths.forEach( function( item, i ){
-      if( typeof(item) !== 'string' )
-        return;
-      var parentArr = item.split('/')
-        , parentStr = parentArr[parentArr.length-1]
-        , parentType = parentStr.split(':')[1]
-        , parentId = parentStr.split(':')[0];
-      self.db.model(parentType).findById(parentId, function( err, parent ){
-        if( err )
-          callback( err );
-        else
-          parentsArr.push( parent );
-        if( i === self.paths.length-1 )
-          callback( null, parentsArr );
-      });
-    });
-  });
+  schema.pre('save', function setupModelNameForStorage( next ){
+    if( this.isNew )
+      this._type = this.constructor.modelName;
+    next();
+  })
 
-  /**
-   * finds all children labeled with this content
-   *
-   * @param {Function} [callback] - [err, array]
-   *
-   */
-  schema.method('children', function( options, callback ){
-
-    var count = 0
-      , childrenArr = []
-      , self = this
-      , collectionsLength = Object.keys(this.db.collections).length;
-
-    function runCallback(){
-      if( ++count === collectionsLength )
-        callback( null, childrenArr );
-    }
-
-    if( typeof(options) === 'function' ){
-      callback = options;
-      options = null;
-    }
-    for( var i in this.db.collections ){
-      if( i === 'users' ){
-        count++;
-        continue;
-      }
-      this.db.collections[i].find({paths: new RegExp('^'+self.id.toString())}, {safe: true}, function( err, cursor ){
-        if( err ){
-          callback( err );
-          return;
-        } else{
-          cursor.toArray(function(err, items) {
-            if( err ){
-              callback( err );
-              return;
-            }
-            items.forEach( function( item ){
-              childrenArr.push( item );
-            })
-            runCallback();
-          });
-        }
-      });
-    }
-  });
-
-  /**
-   * tells query to only return objects with empty paths
-   * array
-   *
-   */
-  schema.statics.rootsOnly = function(bool, callback){
-    if( bool )
-      this.where('paths').equals([]);
-    if( callback )
-      this.exec( callback );
-    else
-      return this;
-  };
-
+  schema.pre('remove', paths.removeChildrenWithoutAssociations );
+  schema.method('parents', paths.parents);
+  schema.method('children', paths.children);
+  schema.method('countChildren', paths.countChildren);
+  schema.statics.rootsOnly = paths.rootsOnly;
 
   /**
    * options for konter plugin

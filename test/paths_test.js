@@ -13,7 +13,7 @@ var should = require("should")
   , konter = require( __dirname + '/../index' )
   , testHelper = require( __dirname + '/test_helper' );
 
-describe('path relation', function(){
+describe('path', function(){
 	var CO = testHelper.CO
 		, co, u1
 
@@ -45,7 +45,7 @@ describe('path relation', function(){
 
 	describe('should label a content with another content', function(){
 
-		it('(parent: object)', function( done ){
+		it('(parent: model object or json)', function( done ){
 			var co2 = new CO({name: 'co2', holder: u1, parent: co });
 			co2.save( function( err ){
 				should.not.exist(err);
@@ -71,19 +71,106 @@ describe('path relation', function(){
 			});
 		});
 
+		it('(parent: array of string(id:type))', function( done ){
+			var co3 = new CO({name: 'co3', holder: u1, parent: [ co.id+':'+co.constructor.modelName ] });
+			co3.save( function( err ){
+				should.not.exist(err);
+				co3.parents( function( err, res ){
+					should.not.exist(err);
+					res.should.be.lengthOf(1)
+					res[0].name.should.eql(co.name);
+					done();
+				});
+			});
+		});
+
+		it('(parent: array of model objects or json)', function( done ){
+			var co3 = new CO({name: 'co3', holder: u1, parent: [ co ] });
+			co3.save( function( err ){
+				should.not.exist(err);
+				co3.parents( function( err, res ){
+					should.not.exist(err);
+					res.should.be.lengthOf(1)
+					res[0].name.should.eql(co.name);
+					done();
+				});
+			});
+		});
+
 	});
 
 	describe('children', function(){
 		
-		it('should return a content\'s children', function( done ){
+		it('should be returned for given content', function( done ){
 			co.children( function( err, children ){
 				should.not.exist(err);
-				children.should.be.lengthOf(2);
+				children.should.be.lengthOf(4);
+				done();
+			});
+		});
+
+		it('should be counted', function( done ){
+			co.countChildren( function( err, count ){
+				should.not.exist(err);
+				count.should.eql( 4 );
 				done();
 			});
 		});
 		
+		it('should be destroyed if no other association exists', function( done ){
+			co.remove( function( err ){
+				should.not.exist(err);
+				CO.findById( co.id, function( err, coDel ){
+					should.not.exist(err);
+					should.not.exist(coDel);
+					co.countChildren( function( err, count ){
+						should.not.exist(err);
+						count.should.eql( 0 );
+						done();
+					});
+				})
+			});
+		});
 
-	})
+		it('should be sorted by pos and name (pos is undefined by default)', function( done ){
+			testHelper.buildTree122( u1, function( err, root ){
+				root.children( function( err, children ){
+					should.not.exist(err);
+					children.should.be.lengthOf( 3 );
+					children[0].name.should.eql( 'c_1_1' );
+					children[1].name.should.eql( 'c_1_2' );
+					children[2].name.should.eql( 'c_1_3_and_2_1' );
+					done();
+				});
+			});
+		});
+
+		it('should not be destroyed if another association exists', function( done ){
+			testHelper.buildTree122( u1, function( err, root ){
+				root.children({name: 'c_1_2'}, function( err, children ){
+					var c_1_2 = children[0];
+					c_1_2.children( {}, {json: true}, function( err, children ){
+						should.not.exist( err );
+						children.should.be.lengthOf( 2 );
+						var c_1_3_and_2_1_id = children[0]._id;
+						var c_2_2_id = children[1]._id;
+						c_1_2.remove( function( err ){
+							should.not.exist( err );
+							CO.findById( c_2_2_id, function( err, res ){
+								should.not.exist( err );
+								should.not.exist( res );
+								CO.findById( c_1_3_and_2_1_id, function( err, res ){
+									should.not.exist( err );
+									should.exist( res );
+									done();
+								})
+							})
+						})
+					});
+				});
+			});
+		});
+
+	});
 
 });

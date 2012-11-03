@@ -6,6 +6,10 @@
   "author": "thorsten zerha <thorsten.zerha@tastenwerk.com>",
   "description": "konter is a content repository",
   "keywords": [ "mongoose", "tas10", "content repository" ],
+  "repository": { 
+    "type" : "git", 
+    "url" : "http://github.com/tastenwerk/konter.git"
+  },
   "homepage": "http://github.com/quaqua/konter",
   "bugs": { 
     "url" : "http://github.com/quaqua/konter/issues", 

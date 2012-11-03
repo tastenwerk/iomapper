@@ -116,7 +116,7 @@ describe('defining new content objects', function(){
 		})
 
 		it('sets up full access for creator', function(){
-			co3.acl[u1._id].should.eql('rwsd');
+			co3.acl[u1._id].privileges.should.eql('rwsd');
 		})
 
 	})
