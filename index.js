@@ -14,9 +14,10 @@ var mongoose = require('mongoose')
 var logSchema = require( __dirname + '/lib/log_schema' )
   , commentSchema = require( __dirname + '/lib/comment_schema' )
   , User = require( __dirname + '/lib/models/user' )
-  , paths = require( __dirname + '/lib/paths' );
+  , paths = require( __dirname + '/lib/paths' )
+  , accessControl = require( __dirname + '/lib/access_control' );
 
-mongoose.Query.prototype.withUser = function withUser( user, callback ){
+mongoose.Query.prototype.execWithUser = function withUser( user, callback ){
   var acl = []
     , allowed = ['acl.'+user.id+'.privileges', 'acl.'+User.anybodyId+'.privileges', 'acl.'+User.everybodyId+'.privileges']
   for( var i in allowed ){
@@ -28,6 +29,8 @@ mongoose.Query.prototype.withUser = function withUser( user, callback ){
   this.exec( function( err, doc ){
     if( err )
       callback( err );
+    else if( !doc )
+      callback( null, null );
     else{
       doc.holder = user;
       callback( null, doc )
@@ -85,25 +88,12 @@ var KonterPlugin = function KonterPlugin (schema, options) {
   schema.virtual('parent').set( paths.setParent );
 
   /**
-   * setup the creator and give full access to their 
-   * newly created object.
-   *
-   * if the holder object has not been set up till here
-   * an error will be passed to the next callback. It is illegal to create
-   * objects without a user being set.
-   *
+   * access control
+   * see lib/access_control.js
    */
-  schema.pre('save', function setupCreatorAndAccess( next ) {
-    if( this.isNew ){
-      if( !this.holder ){
-        next( new Error("[pre.save.setupCreatorAndAccess] konter.securityleak: no holder object has been provided!") );
-        return;
-      }
-      this._creator = this._updater = this.holder._id;
-      this.acl[this._creator] = {privileges: 'rwsd'};
-    }
-    next();
-  });
+  schema.pre( 'save', accessControl.setupCreatorAndAccess );
+  schema.method('share', accessControl.share );
+  schema.method('unshare', accessControl.unshare );
 
   /**
    * save the modelname along with the database

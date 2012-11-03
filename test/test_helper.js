@@ -1,7 +1,7 @@
 var mongoose = require('mongoose')
   , konter = require( __dirname + '/../index' );
 
-mongoose.connect( 'mongodb://localhost:27017/test_konter');
+var conn = mongoose.connect( 'mongodb://localhost:27017/test_konter');
 //mongoose.set('debug', true);
 
 /**
@@ -15,22 +15,11 @@ COSchema.plugin( konter.plugin );
 var testHelper = {
 
   removeAll: function removeAllHelper( callback ){
-
-    var i = 0
-      , all = [
-      konter.models.User,
-      testHelper.CO
-    ];
-
-    function runRemoves(){
-      if( i < all.length )
-        all[i++].remove({}, runRemoves);
-      else
+    conn.connection.collections['users'].drop( function( err ){
+      conn.connection.collections['cos'].drop( function( err ){
         callback();
-    }
-
-    runRemoves();
-
+      });
+    });
   },
 
   CO: mongoose.model( 'CO', COSchema ),

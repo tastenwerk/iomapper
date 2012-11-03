@@ -15,13 +15,20 @@ var should = require("should")
 
 describe('CRUD', function(){
 	var CO = testHelper.CO
-		, co, u1
+		, co, u1, u2;
 
 	before( function( done ){
 		CO.remove({}, function(){
 			testHelper.removeAll( function(){
 				u1 = new konter.models.User( testHelper.userAttrs );
-				u1.save( done );
+				var u2Attrs = testHelper.userAttrs;
+				u2Attrs.email = "u2@localhost.loc";
+				u2Attrs.name.nick = "alf2";
+				u2 = new konter.models.User( u2Attrs );
+				u1.save( function( err ){
+					if( err ) console.log( err );
+					u2.save( done );
+				} );
 			});
 		});
 	});
@@ -74,10 +81,18 @@ describe('CRUD', function(){
 	});
 
 	it('finds an object with given user', function( done ){
-		CO.findOne({name: 'co1-1'}).withUser(u1, function( err, co1 ){
+		CO.findOne({name: 'co1-1'}).execWithUser(u1, function( err, co1 ){
 			should.not.exist( err );
 			co1.name.should.eql('co1-1');
 			co1.holder.id.should.eql(u1.id);
+			done();
+		});
+	});
+
+	it('does not find an object with wrong user', function( done ){
+		CO.findOne({name: 'co1-1'}).execWithUser(u2, function( err, co1 ){
+			should.not.exist( err );
+			should.not.exist( co1 );
 			done();
 		});
 	});
