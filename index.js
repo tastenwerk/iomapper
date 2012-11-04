@@ -92,8 +92,14 @@ var KonterPlugin = function KonterPlugin (schema, options) {
    * see lib/access_control.js
    */
   schema.pre( 'save', accessControl.setupCreatorAndAccess );
+  schema.pre( 'save', accessControl.syncChildren );
   schema.method('share', accessControl.share );
   schema.method('unshare', accessControl.unshare );
+  schema.method('privileges', accessControl.privileges );
+  schema.method('canRead', accessControl.canRead );
+  schema.method('canWrite', accessControl.canWrite );
+  schema.method('canShare', accessControl.canShare );
+  schema.method('canDelete', accessControl.canDelete );
 
   /**
    * save the modelname along with the database

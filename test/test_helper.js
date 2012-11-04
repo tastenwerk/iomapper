@@ -15,6 +15,7 @@ COSchema.plugin( konter.plugin );
 var testHelper = {
 
   removeAll: function removeAllHelper( callback ){
+    
     conn.connection.collections['users'].drop( function( err ){
       conn.connection.collections['cos'].drop( function( err ){
         callback();
