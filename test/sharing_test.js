@@ -100,4 +100,21 @@ describe('SHARING', function(){
 		});	
 	});
 
+	it('copies acl from parent content if a new content is created', function( done ){
+		CO.create( {holder: u1, name: 'co2', parent: co}, function( err, co2 ){
+			should.not.exist( err );
+			co2.isNew.should.not.be.ok;
+			co2.paths.should.be.lengthOf( 1 );
+			var a = (Object.keys(co.acl));
+			console.log(a);
+			a.splice(a.length-1,1);
+			User.find().where('_id').in(a).exec( function( err, users ){
+				console.log( err, users )
+				done();
+			});
+			//console.log('co2', co2.acl );
+			//done();
+		})
+	})
+
 });
