@@ -25,7 +25,9 @@ mongoose.Query.prototype.execWithUser = function withUser( user, callback ){
     h[allowed[i]] = /r*/;
     acl.push( h );
   }
-  this.or( acl );
+  this
+    .or( acl )
+    .where('deletedAt').equals(null);
   this.exec( function( err, doc ){
     if( err )
       callback( err );
@@ -44,6 +46,7 @@ var KonterPlugin = function KonterPlugin (schema, options) {
   						 _creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   						 updatedAt: { type: Date, default: Date.now },
   						 _updater: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+               _deletedAt: Date,
   						 _starred: [ {type: mongoose.Schema.Types.ObjectId, ref: 'user', index: true} ],
                pos: Number,
   						 logs: [ logSchema ],
@@ -114,6 +117,9 @@ var KonterPlugin = function KonterPlugin (schema, options) {
   schema.method('parents', paths.parents);
   schema.method('children', paths.children);
   schema.method('countChildren', paths.countChildren);
+  schema.method('setParent', paths.setParent);
+  schema.method('addParent', paths.setParent);
+  schema.method('removeParent', paths.unsetParent);
   schema.statics.rootsOnly = paths.rootsOnly;
 
   /**

@@ -22,7 +22,8 @@ describe('SHARING', function(){
 		CO.remove({}, function(){
 			testHelper.removeAll( function(){
 				u1 = new konter.models.User( testHelper.userAttrs );
-				co = new CO( { name: 'cosx', holder: u1 } );
+				var co = new CO( { name: 'cosx', holder: u1 } );
+				co.acl = {};
 				var u2Attrs = testHelper.userAttrs;
 				u2Attrs.email = "u3@localhost.loc";
 				u2Attrs.name.nick = "alf3";
@@ -45,17 +46,33 @@ describe('SHARING', function(){
 		});
 	});
 
+	beforeEach( function( done ){
+		CO.findOne( {name: 'cosx' } ).execWithUser( u1, function( err, tco ){
+			co = tco;
+			done();
+		});
+	});
+
+	it('should have only one acl entry', function( done ){
+		CO.findOne( {name: 'cosx' } ).execWithUser( u1, function( err, co ){
+			Object.keys( co.acl ).should.be.lengthOf( 1 );
+			done();
+		});
+	});
+
 	it('shares a content object', function( done ){
-		CO.findOne( {name: 'cosx' } ).execWithUser( u2, function( err, eco ){
+		CO.findOne( {name: 'cosx' } ).execWithUser( u1, function( err, co ){
 			should.not.exist( err );
-			should.not.exist( eco );
-			co.share( u2, 'rw' );
-			co.save( function( err ){
-				should.not.exist( err );
-				CO.findOne( {name: 'cosx' } ).execWithUser( u2, function( err, eco ){
+			CO.findOne( {name: 'cosx' } ).execWithUser( u2, function( err, eco ){
+				should.not.exist( eco );
+				co.share( u2, 'rw' );
+				co.save( function( err ){
 					should.not.exist( err );
-					eco.name.should.eql( 'cosx' );
-					done();
+					CO.findOne( {name: 'cosx' } ).execWithUser( u2, function( err, eco ){
+						should.not.exist( err );
+						eco.name.should.eql( 'cosx' );
+						done();
+					});
 				});
 			});
 		});	
@@ -156,15 +173,14 @@ describe('SHARING', function(){
 	});
 
 	it('copies acl from parent content if a new content is created', function( done ){
-		CO.findOne( {name: 'cosx' } ).execWithUser( u1, function( err, co ){
-			CO.create( {holder: u1, name: 'co2', parent: co}, function( err, co2 ){
-				should.not.exist( err );
-				co2.isNew.should.not.be.ok;
-				co2.paths.should.be.lengthOf( 1 );
-				Object.keys(co2.acl).should.include(User.everybody.id);
-				Object.keys(co2.acl).should.include(u2.id);
-				done();
-			});
+		CO.create( {holder: u1, name: 'co2', acl: {}, parent: co}, function( err, co2 ){
+			should.not.exist( err );
+			co2.isNew.should.not.be.ok;
+			co2.paths.should.be.lengthOf( 1 );
+			Object.keys(co2.acl).should.be.lengthOf( 3 );
+			Object.keys(co2.acl).should.include(User.everybody.id);
+			Object.keys(co2.acl).should.include(u2.id);
+			done();
 		});
 	});
 
@@ -183,5 +199,37 @@ describe('SHARING', function(){
 			});
 		});
 	});
+
+	it('removes acl entries inherited from parent if parent unshares content', function( done ){
+		CO.findOne( {name: 'cosx' } ).execWithUser( u1, function( err, co ){
+			co.unshare( u3 );
+			co.save( function( err ){
+				should.not.exist( err );
+				CO.findOne( {name: 'co2'} ).execWithUser( u1, function( err, co2 ){
+					should.not.exist( err );
+					co2.canWrite(u3).should.be.ok;
+					co2.canShare(u3).should.not.be.ok;
+					co2.canDelete(u3).should.not.be.ok;
+					done();
+				});
+			});
+		});
+	});
+
+	it('removes acl entries inherited from parent if parent is disconnected from child path', function( done ){
+		CO.findOne( {name: 'cosx' } ).execWithUser( u1, function( err, co ){
+			CO.findOne( {name: 'co2'} ).execWithUser( u1, function( err, co2 ){
+				co2.removeParent( co );
+				co2.save( function( err ){
+					should.not.exist( err );
+					CO.findOne( {name: 'co2'} ).execWithUser( u1, function( err, co2 ){
+						should.not.exist( err );
+						co2.canWrite(u3).should.not.be.ok;
+						done();
+					});
+				});
+			});
+		});
+	})
 
 });

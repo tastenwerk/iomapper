@@ -97,6 +97,32 @@ describe('path', function(){
 			});
 		});
 
+		it('adds a parent to a content object', function( done ){
+			var co4 = new CO({name: 'co4', holder: u1 });
+			co4.save( function( err ){
+				should.not.exist( err );
+				co4.addParent( co );
+				co4.save( function( err ){
+					should.not.exist( err );
+					co4.paths.should.be.lengthOf( 1 );
+					done();
+				});
+			});
+		});
+
+		it('removes a parent to a content object', function( done ){
+			var co4 = new CO({name: 'co4', holder: u1 });
+			co4.save( function( err ){
+				should.not.exist( err );
+				co4.removeParent( co );
+				co4.save( function( err ){
+					should.not.exist( err );
+					co4.paths.should.be.lengthOf( 0 );
+					done();
+				});
+			});
+		});
+
 	});
 
 	describe('children', function(){
@@ -104,7 +130,7 @@ describe('path', function(){
 		it('should be returned for given content', function( done ){
 			co.children( function( err, children ){
 				should.not.exist(err);
-				children.should.be.lengthOf(4);
+				children.should.be.lengthOf(5);
 				done();
 			});
 		});
@@ -112,7 +138,7 @@ describe('path', function(){
 		it('should be counted', function( done ){
 			co.countChildren( function( err, count ){
 				should.not.exist(err);
-				count.should.eql( 4 );
+				count.should.eql( 5 );
 				done();
 			});
 		});
@@ -163,9 +189,9 @@ describe('path', function(){
 									should.not.exist( err );
 									should.exist( res );
 									done();
-								})
-							})
-						})
+								});
+							});
+						});
 					});
 				});
 			});

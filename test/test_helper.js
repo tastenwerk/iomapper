@@ -16,11 +16,11 @@ var testHelper = {
 
   removeAll: function removeAllHelper( callback ){
     
-    conn.connection.collections['users'].drop( function( err ){
-      conn.connection.collections['cos'].drop( function( err ){
+    mongoose.models['User'].remove({}, function( err ){
+      mongoose.models['CO'].remove({}, function( err ){
         callback();
-      });
-    });
+      })
+    })
   },
 
   CO: mongoose.model( 'CO', COSchema ),
