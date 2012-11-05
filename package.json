@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "konter",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "preferGlobal": "true",
   "author": "thorsten zerha <thorsten.zerha@tastenwerk.com>",
   "description": "konter is a content repository",
