@@ -137,5 +137,9 @@ module.exports = exports = {
 	plugin: KonterPlugin,
 	models: {
 		User: require( __dirname + '/lib/models/user' )
-	}
+	},
+  connect: function( url, debug ){
+    mongoose.connect( url );
+    mongoose.set('debug', debug);
+  }
 };
