@@ -59,7 +59,7 @@ describe('path', function(){
 		});
 
 		it('(parent: string)', function( done ){
-			var co3 = new CO({name: 'co3', holder: u1, parent: co.id+':'+co.constructor.modelName });
+			var co3 = new CO({name: 'co3', holder: u1, parent: co.id.toString()+':'+co.constructor.modelName });
 			co3.save( function( err ){
 				should.not.exist(err);
 				co3.parents( function( err, res ){

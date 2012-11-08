@@ -162,13 +162,13 @@ describe('user', function(){
 
     });
 
-    describe('#settings', function(){
+    describe('#preferences', function(){
 
       var u = new User(userAttrs);
       u.email = 'diff@localhost.loc';
 
-      it('saves all kinds of settings for the user object', function(){
-        u.settings.should.be.a('object');        
+      it('saves all kinds of preferences for the user object', function(){
+        u.preferences.should.be.a('object');        
       })
     })
 

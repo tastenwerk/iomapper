@@ -141,5 +141,6 @@ module.exports = exports = {
   connect: function( url, debug ){
     mongoose.connect( url );
     mongoose.set('debug', debug);
-  }
+  },
+  mongoose: mongoose
 };
