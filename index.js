@@ -120,8 +120,9 @@ var KonterPlugin = function KonterPlugin (schema, options) {
   schema.method('setParent', paths.setParent);
   schema.method('addParent', paths.setParent);
   schema.method('removeParent', paths.unsetParent);
+  schema.method('parentIds', paths.parentIds);
   schema.statics.rootsOnly = paths.rootsOnly;
-
+  schema.statics.childrenOf = paths.childrenOf;
   /**
    * options for konter plugin
    */
@@ -129,18 +130,106 @@ var KonterPlugin = function KonterPlugin (schema, options) {
     schema.path('updatedAt').index(options.index)
   }
 
-  schema.set('toObject', { getters: true, virtuals: true });
+  schema.set('toObject', { virtuals: true });
 
 }
 
-module.exports = exports = {
+module.exports = exports = konter = {
 	plugin: KonterPlugin,
-	models: {
-		User: require( __dirname + '/lib/models/user' )
-	},
+	models: require( __dirname + '/lib/models'),
+  connection: null,
   connect: function( url, debug ){
-    mongoose.connect( url );
+    konter.connection = mongoose.connect( url );
     mongoose.set('debug', debug);
   },
+
+  firstAnyWithUser: function( user, query, options, callback ){
+
+    konter.findAnyWithUser( user, query, options, function( err, res ){
+
+      if( typeof( callback ) === 'undefined' ){
+        if( typeof( options ) === 'undefined' )
+          callback = query;
+        else
+          callback = options;
+        options = null;
+      }
+
+      if( err )
+        callback( err );
+      else if( res.length > 0 )
+        callback( null, res[0]);
+      else
+        callback( null, null );
+    });
+  },
+
+  findAnyWithUser: function(user, query, options, callback ){
+
+    var count = 0
+      , childrenArr = []
+      , self = this
+      , resultsArr = []
+      , childrenCount = 0
+      , models = konter.models
+      , collectionsLength = Object.keys(models).length;
+
+    function runInitChild(){
+      var item = childrenArr[childrenCount++];
+      models[item._type].findById( item._id ).execWithUser( user, function( err, child ){
+        child.holder = user;
+        resultsArr.push( child );
+        if( childrenCount < childrenArr.length )
+          runInitChild();
+        else
+          callback( null, paths._sortArray( resultsArr, options && options.sort ) );
+      })
+    }
+
+    function runCallback(){
+      if( ++count === collectionsLength )
+        if( childrenArr.length > 0 )
+          runInitChild();
+        else
+          callback( null, [] );
+    }
+
+    if( typeof( callback ) === 'undefined' ){
+      if( typeof( options ) === 'undefined' )
+        callback = query;
+      else
+        callback = options;
+      options = null;
+    }
+
+    // setup query
+    var q = {};
+    if( query )
+      for( var i in query )
+        q[i] = query[i];
+
+    for( var i in mongoose.connection.collections ){
+      mongoose.connection.collections[i].find(q, function( err, cursor ){
+        if( err ){
+          callback( err );
+          return;
+        } else{
+          cursor.toArray(function(err, items) {
+            if( err ){
+              callback( err );
+              return;
+            }
+            items.forEach( function( item ){
+              if( item._type )
+                childrenArr.push( item );
+            });
+            runCallback();
+          });
+        }
+      });
+    }
+
+  },
+
   mongoose: mongoose
 };

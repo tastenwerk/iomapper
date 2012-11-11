@@ -1,7 +1,7 @@
 var mongoose = require('mongoose')
   , konter = require( __dirname + '/../index' );
 
-var conn = mongoose.connect( 'mongodb://localhost:27017/test_konter');
+var conn = konter.connect( 'mongodb://localhost:27017/test_konter');
 //mongoose.set('debug', true);
 
 /**
@@ -11,6 +11,8 @@ var conn = mongoose.connect( 'mongodb://localhost:27017/test_konter');
 
 var COSchema = mongoose.Schema();
 COSchema.plugin( konter.plugin );
+
+var CO = konter.models['CO'] = mongoose.model( 'CO', COSchema );
 
 var testHelper = {
 
@@ -23,7 +25,7 @@ var testHelper = {
     })
   },
 
-  CO: mongoose.model( 'CO', COSchema ),
+  CO: CO,
 
   userAttrs: { name: {first: 'Alfred', last: 'Quack', nick: 'alf'}, email: 'alf@localhost.loc', password: 'alftest' },
 

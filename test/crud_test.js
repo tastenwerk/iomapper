@@ -89,6 +89,22 @@ describe('CRUD', function(){
 		});
 	});
 
+	it('finds an object with findAnyWithUser method (by parsing all collections)', function( done ){
+		konter.findAnyWithUser( u1, {name: 'co1-1'}, function( err, co1 ){
+			should.not.exist( err );
+			co1[0].name.should.equal('co1-1');
+			done();
+		})
+	})
+
+	it('finds an object with firstAnyWithUser method (by parsing all collections)', function( done ){
+		konter.firstAnyWithUser( u1, {name: 'co1-1'}, function( err, co1 ){
+			should.not.exist( err );
+			co1.name.should.equal('co1-1');
+			done();
+		})
+	})
+
 	it('does not find an object with wrong user', function( done ){
 		CO.findOne({name: 'co1-1'}).execWithUser(u2, function( err, co1 ){
 			should.not.exist( err );
