@@ -115,6 +115,7 @@ var KonterPlugin = function KonterPlugin (schema, options) {
 
   schema.pre('remove', paths.removeChildrenWithoutAssociations );
   schema.method('parents', paths.parents);
+  schema.method('ancestors', paths.ancestors);
   schema.method('children', paths.children);
   schema.method('countChildren', paths.countChildren);
   schema.method('setParent', paths.setParent);
