@@ -71,6 +71,17 @@ var KonterPlugin = function KonterPlugin (schema, options) {
   });
 
   /**
+   * the name of the collection (also used in urls)
+   * which makes it easier to not allways check for
+   * singular and plural
+   *
+   * @returns {String} collectionName
+   */
+  schema.virtual('collectionName').get( function(){
+    return this.constructor.collectionName;
+  });
+
+  /**
    * set the holder of this content object.
    *
    * @param {User} - the user object to be holding this
@@ -131,7 +142,7 @@ var KonterPlugin = function KonterPlugin (schema, options) {
     schema.path('updatedAt').index(options.index)
   }
 
-  schema.set('toObject', { virtuals: true });
+  schema.set('toJSON', { getters: true }); // not working!!!
 
 }
 
@@ -172,8 +183,9 @@ module.exports = exports = konter = {
       , self = this
       , resultsArr = []
       , childrenCount = 0
-      , models = konter.models
+      , models = konter.mongoose.models
       , collectionsLength = Object.keys(models).length;
+
 
     function runInitChild(){
       var item = childrenArr[childrenCount++];

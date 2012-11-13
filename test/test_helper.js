@@ -52,7 +52,7 @@ var testHelper = {
                       if( err )
                         done( err );
                       else
-                        done( null, root);
+                        done( null, root, doc_l2_2);
                     });
                 });
             });

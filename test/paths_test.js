@@ -142,7 +142,7 @@ describe('path', function(){
 				done();
 			});
 		});
-		
+
 		it('should be destroyed if no other association exists', function( done ){
 			co.remove( function( err ){
 				should.not.exist(err);
@@ -198,5 +198,18 @@ describe('path', function(){
 		});
 
 	});
+
+	
+	it('should return node ancestors', function( done ){
+		testHelper.buildTree122( u1, function( err, root, lastChild ){
+			lastChild.ancestors( function( err, ancs ){
+				should.not.exist(err);
+				ancs.should.be.lengthOf( 2 );
+				ancs[0].name.should.equal( root.name );
+				done();
+			});
+		});
+	});
+
 
 });

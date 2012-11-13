@@ -58,7 +58,7 @@ describe('CRUD', function(){
 	});
 
 	it('doesn\'t create empty objects without a holder', function( done ){
-		var co1e = new CO({name: 'co1e'});
+		var co1e = co = new CO({name: 'co1e'});
 		co1e.save( function( err ){
 			should.exist(err);
 			err.should.eql(new Error('[pre.save.setupCreatorAndAccess] konter.securityleak: no holder object has been provided!'));
@@ -99,6 +99,15 @@ describe('CRUD', function(){
 
 	it('finds an object with firstAnyWithUser method (by parsing all collections)', function( done ){
 		konter.firstAnyWithUser( u1, {name: 'co1-1'}, function( err, co1 ){
+			should.not.exist( err );
+			co = co1;
+			co1.name.should.equal('co1-1');
+			done();
+		})
+	})
+
+	it('finds an object with firstAnyWithUser method (by parsing all collections)', function( done ){
+		konter.firstAnyWithUser( u1, {_id: co._id }, function( err, co1 ){
 			should.not.exist( err );
 			co1.name.should.equal('co1-1');
 			done();
