@@ -105,6 +105,26 @@ var KonterPlugin = function KonterPlugin (schema, options) {
   schema.virtual('parent').set( paths.setParent );
 
   /**
+   * return if this document is published
+   *
+   * @returns {Boolean} [published]
+   */
+  schema.virtual('published').get( function isPublished(){
+    return this.canRead( konter.mongoose.models.User.anybody );
+  });
+
+  /**
+   * return if the privileges for current document
+   * holder
+   *
+   * @returns {String} [privileges] 'rwsd'
+   *
+   */
+  schema.virtual('holderPrivileges').get( function holderPrivileges(){
+    return this.privileges();
+  });
+
+  /**
    * access control
    * see lib/access_control.js
    */
