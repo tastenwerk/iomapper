@@ -34,7 +34,10 @@ mongoose.Query.prototype.execWithUser = function withUser( user, callback ){
     else if( !doc )
       callback( null, null );
     else{
-      doc.holder = user;
+      if( doc instanceof Array )
+        doc.map( function(d){ d.holder = user; });
+      else
+        doc.holder = user;
       callback( null, doc )
     }
   });
