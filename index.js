@@ -213,8 +213,10 @@ module.exports = exports = konter = {
     function runInitChild(){
       var item = childrenArr[childrenCount++];
       models[item._type].findById( item._id ).execWithUser( user, function( err, child ){
-        child.holder = user;
-        resultsArr.push( child );
+        if( child ){
+          child.holder = user;
+          resultsArr.push( child );
+        }
         if( childrenCount < childrenArr.length )
           runInitChild();
         else
