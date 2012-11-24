@@ -70,7 +70,10 @@ var KonterPlugin = function KonterPlugin (schema, options) {
    *
    */
   schema.virtual('holder').get( function(){
-    return this._holder;
+    if( this._holder ){
+      this._holder.loginLog = [];
+      return this._holder;
+    }
   });
 
   /**
