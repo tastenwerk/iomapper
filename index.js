@@ -49,7 +49,7 @@ var KonterPlugin = function KonterPlugin (schema, options) {
   						 _creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   						 updatedAt: { type: Date, default: Date.now },
   						 _updater: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-               _deletedAt: Date,
+               deletedAt: Date,
   						 _starred: [ {type: mongoose.Schema.Types.ObjectId, ref: 'user', index: true} ],
                pos: Number,
   						 logs: [ logSchema ],
