@@ -168,7 +168,7 @@ var KonterPlugin = function KonterPlugin (schema, options) {
     schema.path('updatedAt').index(options.index)
   }
 
-  schema.set('toJSON', { getters: true }); // not working!!!
+  schema.set('toJSON', { getters: true });
 
 }
 
