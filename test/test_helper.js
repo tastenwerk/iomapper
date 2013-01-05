@@ -1,7 +1,7 @@
 var mongoose = require('mongoose')
-  , konter = require( __dirname + '/../index' );
+  , iomapper = require( __dirname + '/../index' );
 
-var conn = konter.connect( 'mongodb://localhost:27017/test_konter');
+var conn = iomapper.connect( 'mongodb://localhost:27017/test_iomapper');
 //mongoose.set('debug', true);
 
 /**
@@ -10,9 +10,9 @@ var conn = konter.connect( 'mongodb://localhost:27017/test_konter');
  */
 
 var COSchema = mongoose.Schema();
-COSchema.plugin( konter.plugin );
+COSchema.plugin( iomapper.plugin );
 
-var CO = konter.models['CO'] = mongoose.model( 'CO', COSchema );
+var CO = iomapper.models['CO'] = mongoose.model( 'CO', COSchema );
 
 var testHelper = {
 

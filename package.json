@@ -1,19 +1,18 @@
 {
-  "private": false,
-  "name": "konter",
-  "version": "0.0.3",
+  "name": "iomapper",
+  "version": "0.1.0",
   "preferGlobal": "true",
   "author": "thorsten zerha <thorsten.zerha@tastenwerk.com>",
-  "description": "konter is a content repository",
-  "keywords": [ "mongoose", "tas10", "content repository" ],
+  "description": "iomapper is a content repository plugin for mongoosejs",
+  "keywords": [ "mongoose", "TASTENWERK", "content repository" ],
   "repository": { 
     "type" : "git", 
-    "url" : "http://github.com/tastenwerk/konter.git"
+    "url" : "http://github.com/tastenwerk/iomapper.git"
   },
-  "homepage": "http://github.com/quaqua/konter",
+  "homepage": "http://github.com/tastenwerk/iomapper",
   "bugs": { 
-    "url" : "http://github.com/quaqua/konter/issues", 
-    "email" : "konter@tastenwerk.com"
+    "url" : "http://github.com/tastenwerk/iomapper/issues", 
+    "email" : "iomapper@tastenwerk.com"
   },
   "main": "index",
   "dependencies": {

@@ -1,10 +1,10 @@
 /**
- * KONTER
+ * iomapper
  *
  * content repository plugin for mongoose
  *
  * written by TASTENWERK http://tastenwerk.com
- * plugin repository: http://github.com/tastenwerk/konter
+ * plugin repository: http://github.com/tastenwerk/iomapper
  *
  */
 
@@ -113,7 +113,7 @@ var KonterPlugin = function KonterPlugin (schema, options) {
    * @returns {Boolean} [published]
    */
   schema.virtual('published').get( function isPublished(){
-    return this.canRead( konter.mongoose.models.User.anybody );
+    return this.canRead( iomapper.mongoose.models.User.anybody );
   });
 
   /**
@@ -162,7 +162,7 @@ var KonterPlugin = function KonterPlugin (schema, options) {
   schema.statics.rootsOnly = paths.rootsOnly;
   schema.statics.childrenOf = paths.childrenOf;
   /**
-   * options for konter plugin
+   * options for iomapper plugin
    */
   if (options && options.index) {
     schema.path('updatedAt').index(options.index)
@@ -172,18 +172,18 @@ var KonterPlugin = function KonterPlugin (schema, options) {
 
 }
 
-module.exports = exports = konter = {
+module.exports = exports = iomapper = {
 	plugin: KonterPlugin,
 	models: require( __dirname + '/lib/models'),
   connection: null,
   connect: function( url, debug ){
-    konter.connection = mongoose.connect( url );
+    iomapper.connection = mongoose.connect( url );
     mongoose.set('debug', debug);
   },
 
   firstAnyWithUser: function( user, query, options, callback ){
 
-    konter.findAnyWithUser( user, query, options, function( err, res ){
+    iomapper.findAnyWithUser( user, query, options, function( err, res ){
 
       if( typeof( callback ) === 'undefined' ){
         if( typeof( options ) === 'undefined' )
@@ -209,7 +209,7 @@ module.exports = exports = konter = {
       , self = this
       , resultsArr = []
       , childrenCount = 0
-      , models = konter.mongoose.models
+      , models = iomapper.mongoose.models
       , collectionsLength = Object.keys(models).length;
 
 

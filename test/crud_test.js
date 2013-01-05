@@ -1,5 +1,5 @@
 /**
- * konter/test/paths_test.js
+ * iomapper/test/paths_test.js
  *
  * KONTER - content repository for Javascript
  *
@@ -10,7 +10,7 @@
  */
 var should = require("should")
   , mongoose = require('mongoose')
-  , konter = require( __dirname + '/../index' )
+  , iomapper = require( __dirname + '/../index' )
   , testHelper = require( __dirname + '/test_helper' );
 
 describe('CRUD', function(){
@@ -20,11 +20,11 @@ describe('CRUD', function(){
 	before( function( done ){
 		CO.remove({}, function(){
 			testHelper.removeAll( function(){
-				u1 = new konter.models.User( testHelper.userAttrs );
+				u1 = new iomapper.models.User( testHelper.userAttrs );
 				var u2Attrs = testHelper.userAttrs;
 				u2Attrs.email = "u2@localhost.loc";
 				u2Attrs.name.nick = "alf2";
-				u2 = new konter.models.User( u2Attrs );
+				u2 = new iomapper.models.User( u2Attrs );
 				u1.save( function( err ){
 					if( err ) console.log( err );
 					u2.save( done );
@@ -61,7 +61,7 @@ describe('CRUD', function(){
 		var co1e = co = new CO({name: 'co1e'});
 		co1e.save( function( err ){
 			should.exist(err);
-			err.should.eql(new Error('[pre.save.setupCreatorAndAccess] konter.securityleak: no holder object has been provided!'));
+			err.should.eql(new Error('[pre.save.setupCreatorAndAccess] iomapper.securityleak: no holder object has been provided!'));
 			done();
 		})
 	});
@@ -90,7 +90,7 @@ describe('CRUD', function(){
 	});
 
 	it('finds an object with findAnyWithUser method (by parsing all collections)', function( done ){
-		konter.findAnyWithUser( u1, {name: 'co1-1'}, function( err, co1 ){
+		iomapper.findAnyWithUser( u1, {name: 'co1-1'}, function( err, co1 ){
 			should.not.exist( err );
 			co1[0].name.should.equal('co1-1');
 			done();
@@ -98,7 +98,7 @@ describe('CRUD', function(){
 	})
 
 	it('finds an object with firstAnyWithUser method (by parsing all collections)', function( done ){
-		konter.firstAnyWithUser( u1, {name: 'co1-1'}, function( err, co1 ){
+		iomapper.firstAnyWithUser( u1, {name: 'co1-1'}, function( err, co1 ){
 			should.not.exist( err );
 			co = co1;
 			co1.name.should.equal('co1-1');
@@ -107,7 +107,7 @@ describe('CRUD', function(){
 	})
 
 	it('finds an object with firstAnyWithUser method (by parsing all collections)', function( done ){
-		konter.firstAnyWithUser( u1, {_id: co._id }, function( err, co1 ){
+		iomapper.firstAnyWithUser( u1, {_id: co._id }, function( err, co1 ){
 			should.not.exist( err );
 			co1.name.should.equal('co1-1');
 			done();

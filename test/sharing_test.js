@@ -1,5 +1,5 @@
 /**
- * konter/test/sharing_test.js
+ * iomapper/test/sharing_test.js
  *
  * KONTER - content repository for Javascript
  *
@@ -10,9 +10,9 @@
  */
 var should = require("should")
   , mongoose = require('mongoose')
-  , konter = require( __dirname + '/../index' )
+  , iomapper = require( __dirname + '/../index' )
   , testHelper = require( __dirname + '/test_helper' )
-  , User = konter.models.User;
+  , User = iomapper.models.User;
 
 describe('SHARING', function(){
 	var CO = testHelper.CO
@@ -21,17 +21,17 @@ describe('SHARING', function(){
 	before( function( done ){
 		CO.remove({}, function(){
 			testHelper.removeAll( function(){
-				u1 = new konter.models.User( testHelper.userAttrs );
+				u1 = new iomapper.models.User( testHelper.userAttrs );
 				var co = new CO( { name: 'cosx', holder: u1 } );
 				co.acl = {};
 				var u2Attrs = testHelper.userAttrs;
 				u2Attrs.email = "u3@localhost.loc";
 				u2Attrs.name.nick = "alf3";
-				u2 = new konter.models.User( u2Attrs );
+				u2 = new iomapper.models.User( u2Attrs );
 				var u3Attrs = testHelper.userAttrs;
 				u3Attrs.email = "u4@localhost.loc";
 				u3Attrs.name.nick = "alf4";
-				u3 = new konter.models.User( u3Attrs );
+				u3 = new iomapper.models.User( u3Attrs );
 				u1.save( function( err ){
 					if( err ) console.log( err );
 					u2.save( function( err ){

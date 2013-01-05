@@ -1,5 +1,5 @@
 /**
- * konter/test/authority_test.js
+ * iomapper/test/authority_test.js
  *
  * KONTER - content repository for Javascript
  *
@@ -10,7 +10,7 @@
  */
 var should = require("should")
   , mongoose = require('mongoose')
-  , konter = require( __dirname + '/../index' )
+  , iomapper = require( __dirname + '/../index' )
   , testHelper = require( __dirname + '/test_helper' );
 
 describe('defining new content objects', function(){
@@ -20,7 +20,7 @@ describe('defining new content objects', function(){
 	 * one additional field called 'num'
 	 */
 	var COSchema = mongoose.Schema({num: Number});
-	COSchema.plugin( konter.plugin );
+	COSchema.plugin( iomapper.plugin );
 
 	var CO = mongoose.model( 'CO', COSchema )
 	  , co
@@ -29,7 +29,7 @@ describe('defining new content objects', function(){
 	before( function( done ){
 		CO.remove({}, function(){
 			testHelper.removeAll( function(){
-				u1 = new konter.models.User( testHelper.userAttrs );
+				u1 = new iomapper.models.User( testHelper.userAttrs );
 				u1.save( done );
 			});
 		});

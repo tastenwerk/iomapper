@@ -1,5 +1,5 @@
 /**
- * konter/test/authority_test.js
+ * iomapper/test/authority_test.js
  *
  * KONTER - content repository for Javascript
  *
@@ -9,11 +9,11 @@
  *
  */
 var should = require("should")
-  , konter = require( __dirname + '/../index' )
+  , iomapper = require( __dirname + '/../index' )
   , testHelper = require( __dirname + '/test_helper' );
 
 
-var User = konter.models.User;
+var User = iomapper.models.User;
 
 /**
  * a user object holds information about the user connected to

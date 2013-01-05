@@ -1,9 +1,9 @@
-# KONTER
+# IOmapper
 content repository eco-system plugin for mongoosejs
 
 ## Installation
 
-npm install konter
+  npm install iomapper
 
 ## Usage examples
 
@@ -37,7 +37,7 @@ in INTER but also used for testing purposes.
 #### Defining schema and models:
 
   var MySchema = mongoose.Schema({ myval: Number });
-  MySchema.plugin( konter.plugin );
+  MySchema.plugin( iomapper.plugin );
   var MyModel = mongoose.model( 'MyModel', MySchema );
 
 #### Createing content
