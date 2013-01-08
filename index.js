@@ -191,21 +191,21 @@ var IOmapperPlugin = function IOmapperPlugin (schema, options) {
    */
   schema.pre( 'save', function createNotification( next ){
 
-    this.addNotification( new mongoose.models.Notification( 
-        { message: 'creation.ok',
-          _creator: this.holder, 
-          read: Object.keys(this.acl),
-          docId: this._id,
-          docName: this.name,
-          type: 'DBNotification',
-          docType: this.collection.name } 
-      ) 
-    );
+    if( this.isNew )
+      this.addNotification( new mongoose.models.Notification( 
+          { message: 'creation.ok',
+            _creator: this.holder, 
+            read: Object.keys(this.acl),
+            docId: this._id,
+            docName: this.name,
+            type: 'DBNotification',
+            docType: this.collection.name } 
+        ) 
+      );
 
     next();
 
   });
-
 
   /**
    * create a notification when removing an object
@@ -220,7 +220,7 @@ var IOmapperPlugin = function IOmapperPlugin (schema, options) {
           docName: this.name,
           type: 'DBNotification',
           docType: this.collection.name } 
-      ) 
+      )
     );
 
     next();
