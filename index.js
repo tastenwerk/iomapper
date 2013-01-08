@@ -196,8 +196,9 @@ var IOmapperPlugin = function IOmapperPlugin (schema, options) {
           _creator: this.holder, 
           read: Object.keys(this.acl),
           docId: this._id,
+          docName: this.name,
           type: 'DBNotification',
-          docType: this.type } 
+          docType: this.collection.name } 
       ) 
     );
 
@@ -216,8 +217,9 @@ var IOmapperPlugin = function IOmapperPlugin (schema, options) {
           _creator: this.holder, 
           read: Object.keys(this.acl),
           docId: this._id,
+          docName: this.name,
           type: 'DBNotification',
-          docType: this.type } 
+          docType: this.collection.name } 
       ) 
     );
 
