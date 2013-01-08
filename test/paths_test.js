@@ -1,7 +1,7 @@
 /**
  * iomapper/test/paths_test.js
  *
- * KONTER - content repository for Javascript
+ * ioMapper - content repository for Javascript
  *
  * (c) 2012 by TAS10WERK
  *

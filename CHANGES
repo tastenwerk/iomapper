@@ -1,0 +1,4 @@
+CHANGES
+
+VERSION 0.2.0
+  - Notification added (a notification will be created on any relevant IO change)

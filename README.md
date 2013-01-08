@@ -9,7 +9,7 @@ content repository eco-system plugin for mongoosejs
 
 ### 1. The Content Repository
 
-Konter implements most of the typical features of a content
+IOmapper implements most of the typical features of a content
 repository:
 
 - access control for any content object
@@ -29,27 +29,27 @@ has to provide is an .id property (as usually any mongoose
 model provides).
 
 KONTER comes with such a user model. It is adapted for use
-in INTER but also used for testing purposes.
+in IO but also used for testing purposes.
 
 
 ### 3. Examples
 
 #### Defining schema and models:
 
-  var MySchema = mongoose.Schema({ myval: Number });
-  MySchema.plugin( iomapper.plugin );
-  var MyModel = mongoose.model( 'MyModel', MySchema );
+    var MySchema = mongoose.Schema({ myval: Number });
+    MySchema.plugin( iomapper.plugin );
+    var MyModel = mongoose.model( 'MyModel', MySchema );
 
 #### Createing content
 
 In order to create content, a user object is required:
 
-  var u = User.create( { name: 'user' }, function(){...});
+    var u = User.create( { name: 'user' }, function(){...});
 
-  MyModel.create( {name: 'my1', hoder: u }, function( err, my ){
-    if( err ) // do some error handling
-    // do something with my object
-  });
+    MyModel.create( {name: 'my1', hoder: u }, function( err, my ){
+      if( err ) // do some error handling
+      // do something with my object
+    });
 
 As you can see, this still is pure mongoose here. But notice
 the holder property. it will set the content's owner and 
@@ -57,10 +57,10 @@ not work if not passed.
 
 #### Finding content
 
-  MyModel.find( {name: 'my1' } ).execWithUser( u, function( err, my ){
-    // if no error, you get your my object initialized with
-    // user u.
-  })
+    MyModel.find( {name: 'my1' } ).execWithUser( u, function( err, my ){
+      // if no error, you get your my object initialized with
+      // user u.
+    })
 
 If you don't initialzie the model with .execWithUser method, you will
 still get your content object, but bypass the content repository
@@ -101,10 +101,10 @@ is stored in the content's 'paths' array.
 
 Privileges are:
 
-  r...READ
-  w...WRITE
-  s...SHARE
-  d...DELETE
+    r...READ
+    w...WRITE
+    s...SHARE
+    d...DELETE
 
 and should always be in this exact order.
 

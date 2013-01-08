@@ -14,6 +14,7 @@ var mongoose = require('mongoose')
 var logSchema = require( __dirname + '/lib/log_schema' )
   , commentSchema = require( __dirname + '/lib/comment_schema' )
   , User = require( __dirname + '/lib/models/user' )
+  , Notification = require( __dirname + '/lib/models/notification' )
   , paths = require( __dirname + '/lib/paths' )
   , accessControl = require( __dirname + '/lib/access_control' );
 
@@ -43,7 +44,7 @@ mongoose.Query.prototype.execWithUser = function withUser( user, callback ){
   });
 };
 
-var KonterPlugin = function KonterPlugin (schema, options) {
+var IOmapperPlugin = function IOmapperPlugin (schema, options) {
 
   schema.add({ createdAt: { type: Date, default: Date.now },
   						 _creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -150,6 +151,80 @@ var KonterPlugin = function KonterPlugin (schema, options) {
     next();
   })
 
+  /**
+   * add a notification to be stored after this object has been
+   * saved to the database or a delete action is performed
+   */
+  schema.method('addNotification', function addNotification( _notification ){
+    this.notifications = this.notifications || [];
+    this.notifications.push( _notification );
+  });
+
+  /**
+   * show notifications to be stored after database activity
+   */
+  schema.method('getNotficiations', function getNotifications(){
+    return this.notifications;
+  });
+
+  /**
+   * store notifications if saving passed and there
+   * are any notifications to store
+   */
+  schema.post( 'save', function storeNotifications( doc ){
+    if( this.notifications ){
+      var notificationsDone = 0;
+      var self = this;
+      function storeNextNotification(){
+        if( notificationsDone < self.notifications.length )
+          self.notifications[notificationsDone++].save( function( err ){
+            if( err ) console.log('notification could not be saved ERR', err);
+            storeNextNotification();
+          });
+      }
+      storeNextNotification();
+    }
+  });
+
+  /**
+   * create a notification when creating a new object
+   */
+  schema.pre( 'save', function createNotification( next ){
+
+    this.addNotification( new mongoose.models.Notification( 
+        { message: 'creation.ok',
+          _creator: this.holder, 
+          read: Object.keys(this.acl),
+          docId: this._id,
+          type: 'DBNotification',
+          docType: this.type } 
+      ) 
+    );
+
+    next();
+
+  });
+
+
+  /**
+   * create a notification when removing an object
+   */
+  schema.pre( 'remove', function createNotification( next ){
+
+    this.addNotification( new mongoose.models.Notification( 
+        { message: 'removing.permanent_ok',
+          _creator: this.holder, 
+          read: Object.keys(this.acl),
+          docId: this._id,
+          type: 'DBNotification',
+          docType: this.type } 
+      ) 
+    );
+
+    next();
+
+  });
+
   schema.pre('remove', paths.removeChildrenWithoutAssociations );
   schema.method('parents', paths.parents);
   schema.method('ancestors', paths.ancestors);
@@ -173,7 +248,7 @@ var KonterPlugin = function KonterPlugin (schema, options) {
 }
 
 module.exports = exports = iomapper = {
-	plugin: KonterPlugin,
+	plugin: IOmapperPlugin,
 	models: require( __dirname + '/lib/models'),
   connection: null,
   connect: function( url, debug ){

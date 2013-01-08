@@ -1,7 +1,7 @@
 /**
  * iomapper/test/authority_test.js
  *
- * KONTER - content repository for Javascript
+ * ioMapper - content repository for Javascript
  *
  * (c) 2012 by TAS10WERK
  *
@@ -22,7 +22,7 @@ describe('defining new content objects', function(){
 	var COSchema = mongoose.Schema({num: Number});
 	COSchema.plugin( iomapper.plugin );
 
-	var CO = mongoose.model( 'CO', COSchema )
+	var CO = mongoose.models.CO
 	  , co
 	  , u1
 

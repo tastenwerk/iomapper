@@ -20,9 +20,11 @@ var testHelper = {
     
     mongoose.models['User'].remove({}, function( err ){
       mongoose.models['CO'].remove({}, function( err ){
-        callback();
-      })
-    })
+        mongoose.models['Notification'].remove({}, function( err ){
+          callback();
+        });
+      });
+    });
   },
 
   CO: CO,

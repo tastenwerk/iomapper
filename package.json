@@ -1,6 +1,6 @@
 {
   "name": "iomapper",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "preferGlobal": "true",
   "author": "thorsten zerha <thorsten.zerha@tastenwerk.com>",
   "description": "iomapper is a content repository plugin for mongoosejs",
