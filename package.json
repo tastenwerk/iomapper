@@ -16,7 +16,7 @@
   },
   "main": "index",
   "dependencies": {
-    "mongoose": "*"
+    "mongoose": "3.5.4"
   },
   "devDependencies": {
     "should": "x.x.x",
